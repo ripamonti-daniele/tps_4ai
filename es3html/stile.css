@@ -1,0 +1,25 @@
+main{
+    font-size: 20px;
+}
+
+.intestazione {
+    background-color: blue;
+    color: white;    
+}
+
+.dispari{
+    background-color: black;
+    color: white;
+}
+
+.pari{
+    background-color: white;
+    color: black;
+}
+
+td{
+    padding: 5px;
+    border: 2px solid red;
+    border-radius: 3px;
+    border-collapse: collapse;
+}

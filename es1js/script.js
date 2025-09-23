@@ -1,0 +1,12 @@
+n1 = "15";
+n2 = "7";
+n1 = Number(n1);
+n2 = Number(n2);
+somma = n1 + n2;
+differenza = n1 - n2;
+prodotto = n1 * n2;
+quoziente = n1 / n2;
+console.log("Somma: " + somma);
+console.log("Differenza: " + differenza);
+console.log("Prodotto: " + prodotto);
+console.log("Quoziente: " + quoziente);

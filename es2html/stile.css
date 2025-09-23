@@ -1,0 +1,11 @@
+main{
+    margin-bottom: 500px;
+}
+
+a {
+    color: blue;
+}
+
+a:hover {
+    color: red;
+}
