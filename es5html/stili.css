@@ -1,0 +1,38 @@
+input {
+    width: 300px;
+    height: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+}
+
+label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+select {
+    width: 100px;
+    height: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.invio {
+    width: 150px;
+    height: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: wheat;
+    border: 2px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* 
+fai parte di focus
+} */
