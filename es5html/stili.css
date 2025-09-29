@@ -33,6 +33,18 @@ select {
     cursor: pointer;
 }
 
-/* 
-fai parte di focus
-} */
+.invio:hover {
+    background-color: yellow;
+}
+
+input:not(.invio):focus {
+    border: 2px solid blue;
+    outline: none;
+    background-color: lightyellow;
+}
+
+select:focus {
+    border: 2px solid blue;
+    outline: none;
+    background-color: lightyellow;
+}
