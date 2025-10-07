@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <ul id="elenco">
+
+    </ul>
+
+    <input type="button", value="inseirsci animali", id="btn">
+
+    <script>
+        const lista = ["Cane", "Gatto", "Pappagallo", "Criceto", "Pesce rosso"];
+        const bottone = document.querySelector("#btn");
+        bottone.addEventListener("click", () => {
+            const elenco = document.querySelector("#elenco");
+            for(let i = 0; i < lista.length; i++) {
+                let elemento = document.createElement("li");
+                elemento.textContent = lista[i];
+                elenco.append(elemento);
+            }
+        });
+
+        lista.forEach((element) => console.log(element));
+
+    </script>
+</body>
+</html>
