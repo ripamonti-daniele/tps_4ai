@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indirizzi ip in binario</title>
+    <link rel="stylesheet" href="stili.css">
+</head>
+<body>
+    <div id="test">
+        <input type="number" id="input1">
+        <input type="number" id="input2">
+        <input type="number" id="input3">
+        <input type="number" id="input4">
+        <button id="btn">Inserisci</button>
+    </div>
+
+    <main id="elencorisultati">
+
+    </main>
+
+    <script>
+        //4 byte da un punto
+        //sono validi se compresi tra 0 e 255
+        const main = document.querySelector("#elencorisultati");
+        const btn = document.querySelector("#btn");
+        btn.addEventListener("click", () => {
+            main.innerHTML = "";
+            if (parseInt(input1.value) >= 0 && parseInt(input1.value) <= 255 && parseInt(input2.value) >= 0 && parseInt(input2.value) <= 255 && parseInt(input3.value) >= 0 && parseInt(input3.value) <= 255 && parseInt(input4.value) >= 0 && parseInt(input4.value) <= 255) {
+                let p = document.createElement("p");
+                p.innerText = "Indirizzo ip valido"
+                main.appendChild(p);
+                let testo_binario = document.createElement("p");
+                let testo_ottale = document.createElement("p");
+                let testo_esadecimale = document.createElement("p");
+                
+                testo_binario.innerText = "Forma binaria indirizzo: ";
+                let binario = "";
+                binario += (parseInt(input1.value).toString(2).padStart(8, '0')) + ".";
+                binario += (parseInt(input2.value).toString(2).padStart(8, '0')) + ".";
+                binario += (parseInt(input3.value).toString(2).padStart(8, '0')) + ".";
+                binario += (parseInt(input4.value).toString(2).padStart(8, '0'));
+                testo_binario.innerText += binario;
+                main.appendChild(testo_binario);
+
+                testo_ottale.innerText = "Forma ottale indirizzo: ";
+                let ottale = "";
+                ottale += (parseInt(input1.value).toString(8).padStart(3, '0')) + ".";
+                ottale += (parseInt(input2.value).toString(8).padStart(3, '0')) + ".";
+                ottale += (parseInt(input3.value).toString(8).padStart(3, '0')) + ".";
+                ottale += (parseInt(input4.value).toString(8).padStart(3, '0'));
+                testo_ottale.innerText += ottale;
+                main.appendChild(testo_ottale);
+
+                testo_esadecimale.innerText = "Forma esadecimale indirizzo: ";
+                let esadecimale = "";
+                esadecimale += (parseInt(input1.value).toString(16).padStart(2, '0')) + ".";
+                esadecimale += (parseInt(input2.value).toString(16).padStart(2, '0')) + ".";
+                esadecimale += (parseInt(input3.value).toString(16).padStart(2, '0')) + ".";
+                esadecimale += (parseInt(input4.value).toString(16).padStart(2, '0'));
+                testo_esadecimale.innerText += esadecimale;
+                main.appendChild(testo_esadecimale);
+            }
+            else {
+                let p = document.createElement("p");
+                p.innerText = "Indirizzo ip non valido";
+                main.appendChild(p);
+            }
+        })
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+#test {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+#test input {
+    margin: 5px;
+    width: 200px;
+    text-align: left;
+    height: 30px;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-size: 15px;
+    background-color:antiquewhite;
+}
+
+#test input:focus {
+    background-color: burlywood;
+    outline: none;
+}
+
+#test #btn {
+    margin: 5px;
+    width: 100px;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-size: 15px;
+    background-color:antiquewhite;
+    cursor: pointer;
+}
+
+#test #btn:hover {
+    background-color: burlywood;
+    scale: 1.05;
+}
+
+#elencorisultati {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#elencorisultati p {
+    font-size: 25px;
+    font-family: Arial, Helvetica, sans-serif;
+}
