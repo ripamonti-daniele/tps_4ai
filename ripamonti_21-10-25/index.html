@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <input type="button" value="cliccami" id="btn">
+    
+    <script>
+        //definizione della funzione
+        function saluta_tutti() {
+            alert("ciao a tutti")
+        }
+
+        // saluta_tutti();
+
+        //funzione con paramteri (di default)
+        //i parametri di default vanno assegnati da destra a sinistra
+        function saluta_due_persone(p1 = "persona1", p2 = "persona2") {
+            //apice grave (`) alt + 96 per le stringhe interpolate
+            alert(`ciao ${p1} e ${p2}`);
+        }
+
+        // saluta_due_persone("borno", "gian");
+        // saluta_due_persone();
+
+        //operatore rest
+        //si può usare solo un operatore rest per funzione e deve essere obbligatoriamnete l'ultimo parametro passato
+        function saluta(...persone) {
+            s = "Ciao ";
+            for (const persona of persone) {
+                s += persona + " ";
+            }
+            alert(s);
+        }
+
+        let btn = document.querySelector("#btn");
+        // btn.addEventListener("click", saluta_tutti);
+
+        //funzioni anonime: non hanno un identificatore e vengono usate una sola volta
+        btn.addEventListener("click", () => {
+            //corpo della funzione
+            alert("ciao a tutti");
+        });
+
+        let x = saluta;
+
+    </script>
+</body>
+</html>

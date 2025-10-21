@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controllo di un campo e-mail</title>
+</head>
+<body>
+    <input type="text" title="email" placeholder="E-mail" id="email">
+    <input type="button" value="Invio" id="btn">
+
+    <script>
+        const email = document.querySelector("#email");
+        const btn = document.querySelector("#btn");
+
+        btn.addEventListener("click", () => {
+            if (email.value === "") alert("inserisci l'email");
+            else if (!email.value.includes("@")) alert("@ non presente");
+            else if (email.value.indexOf("@") != email.value.lastIndexOf("@")) alert("puoi inserire una sola @");
+            else if (!email.value.slice(email.value.indexOf("@")).includes(".")) alert("punto non presente nel dominio");
+            else if (email.value.lastIndexOf(".") - email.value.indexOf("@") == 1) alert("inserisci del testo tra la @ e il punto");
+            else if (email.value.indexOf("@") == 0) alert("insersci del testo prima della @");
+            else if (email.value.lastIndexOf(".") == email.value.length -1) alert("inserisci un dominio dopo l'ultimo punto");
+            else alert("email accettata");
+        });
+
+    </script>
+
+    <style>
+        /* Corpo della pagina */
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f2f5;
+        }
+
+        /* Input testo */
+        #email {
+            width: 300px;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            margin-right: 5px;
+        }
+
+        #email:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Pulsante */
+        #btn {
+            width: 200px;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        #btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</body>
+</html>
