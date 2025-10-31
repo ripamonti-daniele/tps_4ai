@@ -8,12 +8,20 @@
 </head>
 <body>
     <main class="container">
-        <form>
-            <input type="text" placeholder="Nome" id="nome">
-            <input type="text" placeholder="Email" id="email">
+        <form id="form">
+            <label>
+                Nome:
+                <input type="text" name="nome" id="nome" placeholder="Mario">
+            </label>
+            <br><br>
+            <label>
+                Email:
+                <input type="email" name="email" id="email" placeholder="mario@email.com">
+            </label>
+            <br><br>
             <button type="submit">Invia</button>
-            <p id="msg" class="hint" aria-live="polite"></p>
         </form>
+        <div id="esito" aria-live="polite"></div>
     </main>
 
     <script src="script.js"></script>
