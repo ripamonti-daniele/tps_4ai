@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback breve con contacaratteri</title>
+    <link rel="stylesheet" href="stileEs3.css">
+</head>
+<body>
+    <main class="container">
+        <form id="form">
+            <label>
+                Nome:
+                <input type="text" name="nome" id="nome" placeholder="Mario">
+            </label>
+            <br><br>
+            <label>
+                Email:
+                <input type="email" name="email" id="email" placeholder="mario@email.com">
+            </label>
+            <br><br>
+            <label id="label_textarea">
+                Messaggio (Lunghezza minima: 30)
+                <textarea name="textarea" id="textarea"></textarea>
+                <p id="contacaratteri">Caratteri scritti: 0</p>
+            </label>
+            <br><br>
+            <button type="submit">Invia</button>
+        </form>
+        <div id="esito" id="btn" aria-live="polite"></div>
+    </main>
+
+    <script src="scriptEs3.js"></script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Iscrizione newsletter con consenso</title>
+    <link rel="stylesheet" href="stileEs2.css">
 </head>
 <body>
     <main class="container">
@@ -19,11 +19,16 @@
                 <input type="email" name="email" id="email" placeholder="mario@email.com">
             </label>
             <br><br>
-            <button type="submit">Invia</button>
+            <label>
+                Accetto la privacy:
+                <input type="checkbox" name="accetto" id="checkbox">
+            </label>
+            <br><br>
+            <button type="submit" id="btn" disabled>Invia</button>
         </form>
         <div id="esito" aria-live="polite"></div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="scriptEs2.js"></script>
 </body>
 </html>

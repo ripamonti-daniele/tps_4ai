@@ -20,6 +20,7 @@
 }
 
 #form label {
+    font-family: sans-serif;
     margin-bottom: 5px;
     font-size: 18px;
 }
@@ -38,9 +39,8 @@
 }
 
 #esito {
+    font-family: sans-serif;
     font-weight: bold;
     margin-top: 10px;
     font-size: 20px;
 }
-
-

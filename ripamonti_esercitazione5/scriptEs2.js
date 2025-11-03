@@ -1,6 +1,8 @@
 const nomeInput = document.getElementById("nome");
 const emailInput = document.getElementById("email");
 const form = document.getElementById("form");
+const checkbox = document.getElementById("checkbox");
+const btn = document.getElementById("btn");
 esito = document.getElementById("esito");
 
 function addFocusStyle(input) {
@@ -27,20 +29,24 @@ form.addEventListener('submit', (e) => {
         esito.textContent = 'Email non valida.';
         emailInput.classList.add('err');
     }
-    else if (nome.value.trim() && email.value.trim()) {
+    else if (nomeInput.value.trim() && emailInput.value.trim()) {
         esito.textContent = 'Registrazione completata con successo!';
         nomeInput.classList.add('accepted');
         emailInput.classList.add('accepted');
     }
     else {
         esito.textContent = 'Compila tutti i campi.';
-        if (!nome.value.trim()) {
+        if (!nomeInput.value.trim()) {
             nomeInput.classList.add('err');
         }
-        if (!email.value.trim()) {
+        if (!emailInput.value.trim()) {
             emailInput.classList.add('err');
         }
     }
+});
+
+checkbox.addEventListener('change', () => {
+    btn.disabled = !checkbox.checked;
 });
 
 addFocusStyle(nomeInput);
