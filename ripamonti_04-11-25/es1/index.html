@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubrica Interattiva</title>
+</head>
+<body>
+    <ul id="lista">
+        
+    </ul>
+
+    <input type="text" id="filtra" placeholder="Filtra per nome">
+
+    <script>
+        let dati = [
+            { nome: "Marco", email: "marco@mail.it", telefono: "3331234567" },
+            { nome: "Giulia", email: "giulia@mail.it", telefono: "3337654321" } 
+        ]
+        const lista = document.getElementById("lista");
+        const filtro = document.getElementById("filtra");
+        let nomi = [];
+
+        function trovaNomi(dati, testo) {
+            nomi = [];
+            for (let elemento of dati) {
+                if (elemento.nome.trim().toLowerCase().includes(testo.trim().toLowerCase())) {
+                    nomi.push(elemento.nome);
+                }  
+            }
+        }
+
+        function visualizza(dati, nomi) {
+            lista.innerHTML = "";
+            for (let elemento of dati) {
+                if (nomi.includes(elemento.nome)) {
+                    let ul = document.createElement("ul");
+                    li = document.createElement("li");
+                    li.textContent = elemento.nome;
+                    ul.appendChild(li);
+                    li = document.createElement("li");
+                    li.textContent = elemento.email;
+                    ul.appendChild(li);
+                    li = document.createElement("li");
+                    li.textContent = elemento.telefono;
+                    ul.appendChild(li);
+                    lista.appendChild(ul);
+                    lista.appendChild(document.createElement("br"));
+                }
+            }
+        }
+
+        trovaNomi(dati, "")
+        visualizza(dati, nomi);
+        
+        filtro.addEventListener("input", () => {
+            let testo = filtro.value;
+            trovaNomi(dati, testo);
+            visualizza(dati, nomi);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo media e voto finale</title>
+</head>
+<body>
+    <ul id="voti"></ul>
+
+    <script>
+        const contenitore = document.getElementById("voti");
+        voti = [8, 2, 5, 7, 5, 3, 6, 10, 5]
+
+        function calcolaMedia(voti) {
+            somma = 0;
+            for (let voto of voti) {
+                somma += voto;
+            }
+            media = somma / voti.length;
+            media.toFixed(2);
+            media = Math.round(media * 100) / 100;
+            visualizza(voti, media);
+        }
+
+        calcolaMedia(voti);
+
+        function visualizza(voti, media) {
+            for (let v in voti) {
+                li = document.createElement("li");
+                li.textContent = "Voto: " + voti[v];
+                contenitore.appendChild(li);
+            }
+            li = document.createElement("li");
+            li.textContent = "Media: " + media;
+            contenitore.appendChild(li);
+        }
+
+    </script>
+</body>
+</html>
