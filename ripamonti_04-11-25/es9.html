@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validazione email</title>
+</head>
+<body>
+    <form>
+        <label>
+            Nome:
+            <input type="text" placeholder="Mario" id="nome">
+        </label>
+        <label>
+            Età:
+            <input type="text" placeholder="18" id="eta">
+        </label>
+        <label>
+            Email:
+            <input type="text" placeholder="18" id="email">
+        </label>
+        <button id="btn">Invio</button>
+        <h3 id="info"></h3>
+    </form>
+
+    <script>
+        const nome = document.getElementById("nome");
+        const eta = document.getElementById("eta");
+        const email = document.getElementById("email");
+        const btn = document.getElementById("btn");
+        const info = document.getElementById("info");
+
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (nome.value.trim().length < 2) info.textContent = "nome troppo corto";
+            else if (isNaN(eta.value) || eta.value < 14 || eta.value > 99) info.textContent = "età non accettabile";
+            else if (!email.value.includes("@") || !email.value.split("@")[email.value.split("@").length -1].includes(".")) info.textContent = "formato email non valido";
+            else info.textContent = "registrazione avvenuta con successo";
+        });
+    </script>
+</body>
+</html>

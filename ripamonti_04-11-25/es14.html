@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iscrizione newsletter con consenso</title>
+</head>
+<body>
+    <form>
+        <label>
+            Nome:
+            <input type="text">
+        </label>
+        <label>
+            Email:
+            <input type="email">
+        </label>
+        <input type="checkbox" id="checkbox">
+        <button id="btn" disabled>Invio</button>
+    </form>
+
+    <script>
+        const checkbox = document.getElementById("checkbox");
+        const btn = document.getElementById("btn");
+
+        checkbox.addEventListener("change", (e) => {
+            if (checkbox.checked) btn.disabled = false;
+            else btn.disabled = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidenziatore errore al blur</title>
+</head>
+<body>
+    <input type="text" id="input">
+
+    <style>
+        #input{
+            outline: none;
+        }
+
+        .err{
+            outline: none;
+            border: 2px solid red;
+        }
+    </style>
+    <script>
+        const input = document.getElementById("input");
+        input.addEventListener("input", () => {
+            input.classList.remove("err");
+        });
+        input.addEventListener("blur", () => {
+            if(!input.value) input.classList.add("err");
+        });
+    </script>
+</body>
+</html>

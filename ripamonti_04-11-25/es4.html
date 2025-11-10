@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaggi personalizzati con forEach</title>
+</head>
+<body>
+    <script>
+        citta = ["Milano", "Berlino", "Tokyo", "Beijing", "Bergamo", "Los Angeles", "Buenos Aires"];
+        lista = document.createElement("ul");
+
+        citta.forEach(c => {
+            testo = document.createElement("li");
+            testo.textContent = "Vorrei visitare " + c;
+            lista.appendChild(testo);
+        });
+
+        document.body.appendChild(lista);
+    </script>
+</body>
+</html>

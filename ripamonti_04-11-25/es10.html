@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validazione indirizzo IP</title>
+</head>
+<body>
+    <h3>Indirizzo IP:</h3>
+    <input type="text" id="ip">
+    <button id="btn">Verifica</button>
+    <h3 id="info"></h3>
+
+    <script>
+        const ip = document.getElementById("ip");
+        const btn = document.getElementById("btn");
+        const info = document.getElementById("info");
+
+        btn.addEventListener("click", (e) => {
+            ip.textContent = ip.textContent.trim();
+            ottetti = ip.value.split(".");
+            if (ottetti.length !== 4) info.textContent = "indirizzo ip non valido";
+            else if (ottetti.every(ottetto => ottettoValido(ottetto))) info.textContent = "indirizzo ip valido";
+            else info.textContent = "indirizzo ip non valido";
+        });
+
+        function ottettoValido(ottetto) {
+            if (isNaN(ottetto) || Number(ottetto) < 0 || Number(ottetto) > 255) return false;
+            else return true;
+        }
+
+    </script>
+</body>
+</html>
