@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barre comparativo</title>
+</head>
+<body>
+    <h1>Barre comparativo</h1>
+    <canvas id="grafico">
+
+    </canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById("grafico");
+        const data = {
+            labels: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven'],
+            datasets: [
+                { label: 'Visitatori settimana 1', data: [12, 19, 3, 5, 2] },
+                { label: 'Visitatori settimana 2', data: [9, 13, 15, 5, 6] }
+            ]
+        };
+        new Chart(ctx, {
+            type : 'bar',
+            data,
+            options : {
+                responsive: true,
+                // barThickness: 35,
+                categoryPercentage: 0.5,
+                plugins : {legend: {position: 'top'}, title: {display: true, text: 'Settimana'}},
+                y: {beginAtZero: true},
+                x: {title: {display: true, text: 'Visitatori'}}
+            }
+        });
+
+    </script>
+</body>
+</html>

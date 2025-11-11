@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linea con dati reali</title>
+</head>
+<body>
+    <h1>Linea con dati reali</h1>
+    <canvas id="grafico">
+
+    </canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById("grafico");
+        const data = {
+            labels :  ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+            datasets : [{
+                label : 'Temperatura media',
+                data : [22, 19, 20, 18, 23, 20, 17],
+                tension : 0.3,
+                pointRadius : 3
+            }, 
+            {
+                label : 'Temperatura media',
+                data : [10, 11, 8, 13, 14, 15, 11],
+                tension : 0.3,
+                pointRadius : 3
+            }]
+        };
+        new Chart(ctx, {
+            type : 'line',
+            data : data,
+            options : {
+                responsive: true,
+                scales: {
+                    y: {beginAtZero: true, ticks: {callback: v => v + '°C'}, title: {display: true, text: 'Temperatura'}},
+                    x: {title: {display: true, text: 'Giorno'}}
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

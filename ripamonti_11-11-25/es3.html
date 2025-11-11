@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torta con percentuali</title>
+</head>
+<body>
+    <h1>Torta con percentuali</h1>
+    <canvas id="grafico">
+
+    </canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById("grafico");
+        const data = {
+            labels : ["Asia", "Africa", "Europa", "America del Nord", "America del Sud", "Oceania"],
+            datasets : [{
+                label : 'Popolazione del mondo (in milioni di abitanti)',
+                data : [4835, 1550, 743, 617, 434, 44],
+            }]
+        };
+        new Chart(ctx, {
+            type : 'pie',
+            // type : 'doughnut',
+            data : data,
+            options : {
+                plugins : {
+                    title : {display: true, text: "Voti Ripamonti 4Ai"},
+                    legend : {position : 'top'},
+                    // tooltips : {callbacks: {
+                    //     label: function() {
+                    //     let somma = 0;
+                    //     data.forEach(element => {
+                    //         somma += element;
+                    //     });
+                    //     return "label" + ":" + v / somma * 100 + '%';
+                    // }
+                    // }}
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
