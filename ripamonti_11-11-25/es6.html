@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classifica con ordinamento</title>
+</head>
+<body>
+    <h1>Classifica con ordinamento</h1>
+    <button id="btn1">Ordina crescentemente</button>
+    <button id="btn2">Ordina decrescentemente</button>
+    <canvas id="grafico">
+
+    </canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById("grafico");
+        const data = {
+            labels : ['Categoria A', 'Categoria B', 'Categoria C', 'Categoria D', 'Categoria E', 'Categoria F', 'Categoria G', 'Categoria H'],
+            datasets : [{
+                label : 'Punteggio',
+                data : [142, 168, 109, 198, 155, 123, 165, 166],
+                backgroundColor : ['red', 'green', 'blue', 'pink', 'orange', 'yellow', 'purple', 'lime'],
+                borderColor : 'black',
+                borderWidth : 2
+            }]
+        };
+        const chart = new Chart(ctx, {
+            type : 'bar',
+            data : data,
+            options : {
+                indexAxis: 'y',
+                plugins : {
+                    title : {display: true, text: "Punteggi categorie"},
+                    legend : {position : 'top'}
+                }
+            }
+        });
+
+        const btn1 = document.getElementById("btn1");
+        const btn2 = document.getElementById("btn2");
+        
+        const combinazioni = chart.data.labels.map((label, i) => {
+            return { label: label, value: chart.data.datasets[0].data[i], color: chart.data.datasets[0].backgroundColor[i] };
+        });
+
+        btn1.addEventListener('click', () => {
+            combinazioni.sort((a, b) => a.value - b.value);
+            chart.data.labels = combinazioni.map(item => item.label);
+            chart.data.datasets[0].data = combinazioni.map(item => item.value);
+            chart.data.datasets[0].backgroundColor = combinazioni.map(item => item.color);
+            chart.update();
+        })
+
+        btn2.addEventListener('click', () => {
+            combinazioni.sort((a, b) => b.value - a.value);
+            chart.data.labels = combinazioni.map(item => item.label);
+            chart.data.datasets[0].data = combinazioni.map(item => item.value);
+            chart.data.datasets[0].backgroundColor = combinazioni.map(item => item.color);
+            chart.update();
+        })
+
+    </script>
+</body>
+</html>

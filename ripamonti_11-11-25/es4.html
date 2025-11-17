@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar con opzioni</title>
+    <style>
+        .chart-container {
+            width: 60%;
+            margin: 0 auto;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Radar con opzioni</h1>
+    <div class="chart-container">
+        <canvas id="grafico"></canvas>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById("grafico");
+        const data = {
+            labels : ['Vel', 'Tir', 'Pas', 'Dri', 'Dif', 'Fis'],
+            datasets : [{
+                label : 'Statistiche',
+                data : [90, 93, 82, 90, 33, 80],
+                backgroundColor: 'rgba(0, 123, 255, 0.25)',
+                pointBackgroundColor: ['red', 'blue', 'green', 'orange', 'purple', 'yellow'],
+                borderColor : 'black',
+                borderWidth : 1.5,
+                pointRadius : 8
+            }]
+        };
+        new Chart(ctx, {
+            type : 'radar',
+            data : data,
+            options : {
+                responsive: true,
+                plugins : {
+                    title : {display: true, text: "Cristiano Ronaldo [94]"},
+                    legend : {position : 'top'},
+                },
+                scales: {
+                    r: {suggestedMin: 0, suggestedMax: 100}
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

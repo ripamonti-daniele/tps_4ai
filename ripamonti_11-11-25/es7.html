@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torta: confronto % tra due anni</title>
+</head>
+<body>
+    <h1>Torta: confronto % tra due anni</h1>
+    <div style="width: 50%; display: flex; ">
+        <canvas id="grafico1">
+
+        </canvas>
+        <canvas id="grafico2">
+
+        </canvas>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx1 = document.getElementById("grafico1");
+        const ctx2 = document.getElementById("grafico2");
+        
+        function totale(dati) {
+            let somma = 0;
+            for (d of dati) {
+                somma += d;
+            }
+            return somma;
+        }
+
+        const testo1 = {
+            beforeDraw(chart) {
+                const {ctx, width, height} = chart;
+                ctx.save();
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Totale: ' + totale(data1.datasets[0].data) + '€', width/2, height/2);
+            }
+        };
+
+        const testo2 = {
+            beforeDraw(chart) {
+                const {ctx, width, height} = chart;
+                ctx.save();
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Totale: ' + totale(data2.datasets[0].data) + '€', width/2, height/2);
+            }
+        };
+
+        const data1 = {
+            labels : ['GEN', 'FEB', 'MAR', 'APR', 'MAG', 'GIU', 'LUG', 'AGO', 'SET', 'OTT', 'NOV', 'DIC'],
+            datasets : [{
+                label : 'Valore Bitcoin',
+                data : [42580, 61169, 71332, 60666, 67530, 62754, 64626, 58978, 63339, 70281, 96405, 93557],
+                backgroundColor : ['red', 'green', 'blue', 'yellow', 'purple', 'orange'],
+                borderColor : 'black',
+                borderWidth : 1.5,
+            }]
+        };
+        new Chart(ctx1, {
+            type : 'doughnut',
+            data : data1,
+            options : {
+                plugins : {
+                    responsive: true,
+                    title : {display: true, text: "2024"},
+                    legend : {position : 'top'},
+                }
+            },
+            plugins: [testo1]
+        });
+
+        const data2 = {
+            labels : ['GEN', 'FEB', 'MAR', 'APR', 'MAG', 'GIU', 'LUG', 'AGO', 'SET', 'OTT', 'NOV', 'DIC'],
+            datasets : [{
+                label : 'Valore Bitcoin',
+                data : [94536, 84381, 82548, 94184, 104598, 107171, 115765, 108226, 114048, 109602, 93396, 93396],
+                backgroundColor : ['red', 'green', 'blue', 'yellow', 'purple', 'orange'],
+                borderColor : 'black',
+                borderWidth : 1.5,
+            }]
+        };
+        new Chart(ctx2, {
+            type : 'doughnut',
+            data : data2,
+            options : {
+                plugins : {
+                    responsive: true,
+                    title : {display: true, text: "2025"},
+                    legend : {position : 'top'}
+                }
+            },
+            plugins: [testo2]
+        });
+
+    </script>
+</body>
+</html>

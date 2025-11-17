@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linea: serie doppia e media mobile</title>
+</head>
+<body>
+    <h1>Linea: serie doppia e media mobile</h1>
+    <canvas id="grafico">
+
+    </canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function media_mobile(data) {
+            let media = []
+            data.forEach((elem, ind) => {
+                if (ind == 0) media.push(elem);
+                else if (ind == 1) media.push(parseFloat(((elem + data[ind - 1]) / 2).toFixed(1)));
+                else  media.push(parseFloat(((elem + data[ind - 1] + data[ind - 2]) / 3).toFixed(1)));
+            })
+            return media;
+        }
+
+        const ctx = document.getElementById("grafico");
+        let data = {
+            labels : ['GEN', 'FEB', 'MAR', 'APR', 'MAG', 'GIU', 'LUG', 'AGO', 'SET', 'OTT', 'NOV', 'DIC'],
+            datasets : [{
+                label : 'Prodotto A',
+                data : [10, 12, 17, 14, 9, 8, 9, 11, 11, 19, 21, 16],
+                backgroundColor : 'red',
+                borderColor : 'black',
+                borderWidth : 1,
+                pointRadius : 5
+            },
+            {
+                label : 'Prodotto B',
+                    data : [4, 6, 5, 6, 8, 9, 10, 9, 13, 16, 11, 7],
+                    backgroundColor : 'blue',
+                    borderColor : 'black',
+                    borderWidth : 1,
+                    pointRadius : 5
+            }]
+        };
+
+        data.datasets.push({
+            label : 'Media mobie 3 mesi Prodotto A',
+            data : media_mobile(data.datasets[0].data),
+            backgroundColor : 'green',
+            borderColor : 'black',
+            borderWidth : 1,
+            pointRadius : 5
+        })
+
+        new Chart(ctx, {
+            type : 'line',
+            data : data,
+            options : {
+                plugins : {
+                    title : {display: true, text: "Valori mensili"},
+                    legend : {position : 'top'},
+                    
+                },
+                scales: {
+                    x: {title: {display: true, text: 'Mese'}},
+                    y: {title: {display: true, text: 'Vendite (unità)'}}
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
