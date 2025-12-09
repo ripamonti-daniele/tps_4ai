@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="stili.css">
+</head>
+<body>
+    <!-- creare un form che consenta di inserire elaunni nella tabella -->
+    <main>
+        <form action="">
+            <p><label for="cognome"><input type="text" name="cognome" id="id_cognome" placeholder="Cognome"></label></p>
+            <p><label for="nome"><input type="text" name="nome" id="id_nome" placeholder="Nome"></label></p>
+            <p><label for="media"><input type="number" name="media" id="id_media" placeholder="Media"></label></p>
+            <label for="Italiano">Italiano</label><input type="checkbox" value="Italiano" id="ch1"><label for="Matematica">Matematica</label><input type="checkbox" value="Matematica" id="ch2"> <label for="Informatica">Informatica</label><input type="checkbox" value="Informatica" id="ch3"> <label for="TPS">TPS</label><input type="checkbox" value="TPS" id="ch4"><label for="Sistemi e reti">Sistemi e reti</label><input type="checkbox" value="Sistemi e reti" id="ch5"><label for="Inglese">Inglese</label><input type="checkbox" value="Inglese" id="ch6">
+            <input type="button" value="Inserisci" id="id_btn">
+        </form>
+        <br>
+        <table>
+            <th>Cognome</th>
+            <th>Nome</th>
+            <th>Media</th>
+            <th>Debiti</th>
+            <tbody id="table"></tbody>
+        </table>
+        
+    </main>
+    <script>
+        let oggetto = {
+            cognome: "Ripamonti", nome: "Daniele", media: 8.01, debiti: ["Italiano", "Telecomunicazioni"]
+        };
+        let quarta_ai = [
+            oggetto, {cognome: "Gjini", nome: "Enis", media: 5.99, debiti: ["Motoria", "Italiano"]}, {cognome: "Tornatola", nome: "Mattia", media: 10, debiti: []}
+        ];
+        
+        //FORMATO JSON
+        // let stringajson = JSON.stringify(oggetto, null, 2)
+        // console.log(stringajson);
+        
+        // let oggetto2 = JSON.parse(stringajson)
+        // console.log(oggetto2)
+
+        let checkbox = [document.getElementById("ch1"), document.getElementById("ch2"), document.getElementById("ch3"), document.getElementById("ch4"), document.getElementById("ch5"), document.getElementById("ch6"),]
+
+        function aggiornaTabella() {
+            quarta_ai.forEach(elemento => {
+            let td1 = document.createElement("td");
+            td1.textContent = elemento.cognome;
+            let td2 = document.createElement("td");
+            td2.textContent = elemento.nome;
+            let td3 = document.createElement("td");
+            td3.textContent = elemento.media;
+            let td4 = document.createElement("td");
+            td4.textContent = JSON.stringify(elemento.debiti);
+            let row = document.createElement("tr");
+            row.appendChild(td1);
+            row.appendChild(td2);
+            row.appendChild(td3);
+            row.appendChild(td4);
+            let corpo_tabella = document.getElementById("table");
+            corpo_tabella.appendChild(row);
+        })}
+
+        window.addEventListener('load', () => {
+            aggiornaTabella();
+        })
+
+        function crea_studente() {
+            let studente = {};
+            studente.nome = document.getElementById("id_nome").value;
+            studente.cognome = document.getElementById("id_cognome").value;
+            studente.media = Number(document.getElementById("id_media").value);
+            studente.debiti = [];
+            checkbox.forEach(element => {
+                if (element.checked) studente.debiti.push(element.value);
+            });
+
+            return studente;
+        }
+
+        const btn = document.getElementById("id_btn");
+        btn.addEventListener('click', () => {
+            quarta_ai.push(crea_studente());
+            let corpo_tabella = document.getElementById("table");
+            corpo_tabella.innerHTML = "";
+            aggiornaTabella();
+            document.getElementById("id_cognome").value = "";
+            document.getElementById("id_nome").value = "";
+            document.getElementById("id_media").value = "";
+            checkbox.forEach(element => element.checked = false);
+        })
+
+    </script>
+</body>
+</html>
