@@ -20,15 +20,18 @@
     const div = document.getElementById("test");
     const btn = document.getElementById("btn");
     function cronometro() {
-        n++;
-        if (n < 6) {
+        if (n <= 5) {
             div.textContent = n;
             setTimeout(cronometro, 1000);
+            n++;
         }
-        else div.textContent = "Cronometro fermato";
+        else {
+            div.textContent = "Cronometro fermato";
+            n = 0;
+        }
     }
 
-    btn.addEventListener("click", setTimeout(cronometro, 1000));
+    btn.addEventListener("click", () => cronometro());
 
 </script>
 </html>
