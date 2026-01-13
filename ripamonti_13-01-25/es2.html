@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>2 - Contatore alla rovescia</h1>
+
+    <div id="test">
+        10
+    </div>
+
+</body>
+<script>
+    function decrementa() {
+        let numero = Number(document.getElementById("test").textContent);
+        numero--;
+        document.getElementById("test").textContent = numero;
+        if (numero > 0) setTimeout(decrementa, 1000)
+        else document.getElementById("test").textContent = "Tempo scaduto";
+    }
+
+    setTimeout(decrementa, 1000)
+
+    // const div = document.getElementById("test");
+    // let n = 5;
+    // for(let i = n; i > 0; i--) {
+    //     setTimeout(() => div.textContent += String(i) + " ", 1000 * (n - i))
+    // }
+    // setTimeout(() => div.textContent += "Tempo scaduto", 1000 * n)
+</script>
+</html>

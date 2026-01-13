@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>Sequenzialutà, Callback e Promise</h1>
+
+    <div id="test">
+
+    </div>
+
+</body>
+<script>
+    const div = document.getElementById("test");
+    function funzione_di_Ferrari() {
+        //funzione che scriva nel div#test 
+        //consecutivamente 3 messaggi differenti
+        //inizio
+        //caricamento
+        //fine
+
+        const div = document.getElementById("test");
+        div.textContent += "Caricamento ";
+    }
+    div.textContent += "Inizio ";
+    setTimeout(funzione_di_Ferrari, 5000)
+    div.textContent += "Fine ";
+</script>
+</html>

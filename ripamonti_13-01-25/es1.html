@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>1 - Messaggio ritardato</h1>
+
+    <div id="test">
+
+    </div>
+
+</body>
+<script>
+    const div = document.getElementById("test");
+    div.textContent += "Pagina caricata ";
+    setTimeout(() => div.textContent += "Operazione completata", 3000);
+</script>
+</html>
