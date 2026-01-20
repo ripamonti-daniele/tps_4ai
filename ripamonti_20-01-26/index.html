@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statistiche Sicurezza Personale</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="stili.css">
+</head>
+<body>
+  <h1>Analisi sulla percezione della sicurezza</h1>
+
+  <div class="tabs">
+    <button class="tab-button active" onclick="showTab('grafico1')">Risposte generali</button>
+    <button class="tab-button" onclick="showTab('grafico2')">Motivazioni</button>
+  </div>
+
+  <div id="grafico1" class="tab-content active">
+    <canvas id="canvas1"></canvas>
+  </div>
+
+  <div id="grafico2" class="tab-content">
+    <canvas id="canvas2"></canvas>
+  </div>
+
+  <script>
+    function showTab(id) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelector(`[onclick="showTab('${id}')"]`).classList.add('active');
+    }
+
+    const ctx1 = document.getElementById("canvas1");
+    const ctx2 = document.getElementById("canvas2");
+
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: [
+          'Conoscono persone armate',
+          'Hanno amici armati',
+          'Andrebbero armati alla stazione',
+          'Andrebbero non armati alla stazione'
+        ],
+        datasets: [{
+          label: 'Risposte (su 17)',
+          data: [9, 6, 0, 16],
+          backgroundColor: '#3498db'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Comportamenti e percezioni sulla sicurezza'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Numero di risposte' }
+          }
+        }
+      }
+    });
+
+    new Chart(ctx2, {
+      type: 'pie',
+      data: {
+        labels: ['Difesa personale', 'Sensazione di superiorità', 'Moda', 'Minacciare qualcuno'],
+        datasets: [{
+          label: 'Motivazioni',
+          data: [8, 5, 1, 1],
+          backgroundColor: ['#2ecc71', '#e67e22', '#9b59b6', '#e74c3c']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Motivazioni per uscire armati'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
