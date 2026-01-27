@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+
+<script>
+    function saluta() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("Ciao dal futuro");
+            }, 2000)
+        });
+    }
+
+    saluta().then((messaggio) => {
+        console.log(messaggio);
+    })
+</script>
+
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+
+<script>
+    function operzione() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("Operazione terminata");
+            }, 1000);
+        });
+    }
+
+    operzione().then((msg) => {
+        console.log(msg);
+    });
+</script>
+
+</html>
