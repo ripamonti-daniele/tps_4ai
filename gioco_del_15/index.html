@@ -7,7 +7,13 @@
     <link rel="stylesheet" href="stili.css">
 </head>
 <body>
-    <h1>Gioco del 15</h1>
+    <header class="top-title">
+        <h1>
+            <span id="link-15" class="game-link active">Gioco del 15</span>
+            <span class="sep">|</span>
+            <span id="link-2048" class="game-link">2048</span>
+        </h1>
+    </header>
     <div class="wrapper">
         <div id="game-board"></div>
 
@@ -27,6 +33,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script> 
+    <script type="module" src="main.js"></script>
 </body>
 </html>

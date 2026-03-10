@@ -77,20 +77,66 @@ function reset() {
     inizializzaGriglia();
 }
 
-function scriviRisultato(file, nome, mosse) {
-    let risultati = [];
-    if (fs.existsSync(file)) {
-        const data = fs.readFileSync(file);
-        risultati = JSON.parse(data);
-    }
-    risultati.push({ nome: nome, mosse: mosse });
-    fs.writeFileSync(file, JSON.stringify(risultati, null, 2));
+let _listeners = [];
+export function init() {
+    griglia = document.getElementById("game-board");
+    btnReset = document.getElementById("reset-btn");
+    displayMosse = document.getElementById("moves");
+    // reset state
+    mosse = 0;
+    finePartita = false;
+    animazione = false;
+    // attach listeners
+    const onReset = reset;
+    btnReset.addEventListener("click", onReset);
+    _listeners.push({ el: btnReset, type: 'click', fn: onReset });
+
+    const onSubmit = () => {
+        let nome = document.getElementById("name-input").value.trim();
+        // fallback: save to localStorage
+        const key = 'giocoDel15_results';
+        const arr = JSON.parse(localStorage.getItem(key) || '[]');
+        arr.push({ nome: nome || 'Giocatore', mosse, data: new Date().toISOString() });
+        localStorage.setItem(key, JSON.stringify(arr));
+        document.getElementById("victory-popup").classList.remove("show");
+        document.getElementById("name-input").value = "";
+    };
+    const submitBtn = document.getElementById("submit-name");
+    submitBtn.addEventListener('click', onSubmit);
+    _listeners.push({ el: submitBtn, type: 'click', fn: onSubmit });
+
+    inizializzaGriglia();
 }
 
-const griglia = document.getElementById("game-board");
-const btnReset = document.getElementById("reset-btn");
-const displayMosse = document.getElementById("moves");
-// const fs = require("fs");
+export function destroy() {
+    // remove listeners
+    _listeners.forEach(l => l.el.removeEventListener(l.type, l.fn));
+    _listeners = [];
+    // clear board
+    const board = document.getElementById("game-board");
+    if (board) board.innerHTML = '';
+}
+
+function scriviRisultato(file, nome, mosse) {
+    const dati = { nome: nome, mosse: mosse };
+    // 1. Convertire l'oggetto in stringa JSON
+    const datiJson = JSON.stringify(dati);
+
+    // 2. Creare un Blob con i dati
+    const blob = new Blob([datiJson], { type: "application/json" });
+
+    // 3. Creare un link per il download
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = file;
+
+    // 4. Cliccare programmaticamente
+    link.click();
+}
+
+let griglia = document.getElementById("game-board");
+let btnReset = document.getElementById("reset-btn");
+let displayMosse = document.getElementById("moves");
 let finePartita = false;
 
 let numeri = [];
@@ -104,15 +150,5 @@ numeri[14] = 11;
 numeri[10] = 12;
 numeri[11] = 15; 
 
-btnReset.addEventListener("click", reset);
-
-// Event listener per il popup di vittoria
-document.getElementById("submit-name").addEventListener("click", () => {
-    let nome = document.getElementById("name-input").value.trim();
-    scriviRisultato("gioco_del_15\\giocoDel15.json", nome, mosse);
-    document.getElementById("victory-popup").classList.remove("show");
-    document.getElementById("name-input").value = "";
-});
-
-inizializzaGriglia();
+// Note: module's init() will attach listeners and call inizializzaGriglia
 
