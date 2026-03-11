@@ -145,10 +145,7 @@ for (let i = 1; i <= 15; i++) numeri.push(i);
 let mosse = 0;
 let animazione = false;
 
-// mescola(numeri);
-numeri[14] = 11;
-numeri[10] = 12;
-numeri[11] = 15; 
+mescola(numeri);
 
 // Note: module's init() will attach listeners and call inizializzaGriglia
 
