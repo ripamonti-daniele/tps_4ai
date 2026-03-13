@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,25 +14,112 @@
             <span id="link-2048" class="game-link">2048</span>
         </h1>
     </header>
-    <div class="wrapper">
-        <div id="game-board"></div>
 
-        <aside class="controls">
-            <div id="moves">Mosse: 0</div>
-            <button id="reset-btn">Gioca ancora</button>
-        </aside>
+    <div class="wrapper">
+        <!-- CLASSIFICA A SINISTRA -->
+        <div id="classifica">
+            <h3>🏆 Top 10</h3>
+            <ul id="lista-classifica"></ul>
+        </div>
+
+        <!-- GRIGLIA DI GIOCO AL CENTRO -->
+        <div class="game-area">
+            <div id="game-board"></div>
+
+            <aside class="controls">
+                <div id="moves">Mosse: 0</div>
+                <button id="reset-btn">Gioca ancora</button>
+            </aside>
+        </div>
+
+        <!-- PLACEHOLDER DESTRA per simmetria -->
+        <div class="side-spacer"></div>
     </div>
 
-    <!-- Popup personalizzato -->
+    <!-- POPUP VITTORIA / GAME OVER -->
     <div id="victory-popup" class="popup">
         <div class="popup-content">
-            <h2>Hai vinto!</h2>
+            <h2 id="popup-title">Hai completato il gioco!</h2>
             <p id="victory-message"></p>
             <input type="text" id="name-input" placeholder="Inserisci il tuo nome">
-            <button id="submit-name">Invia</button>
+            <button id="submit-name">Salva punteggio</button>
         </div>
     </div>
 
     <script type="module" src="main.js"></script>
+    <script type="module">
+        import { caricaClassifica, salvaPunteggio } from './giocoDel15.js';
+        import { caricaClassifica2048, salvaPunteggio2048 } from './2048.js';
+
+        // Tiene traccia del gioco attivo ('15' o '2048')
+        window._giocoAttivo = '15';
+
+        function creaRiga(i, nome, score) {
+            const li = document.createElement('li');
+            const medals = ['🥇','🥈','🥉'];
+            const rank = medals[i] || `${i+1}.`;
+            li.innerHTML = `<span class="rank">${rank}</span><span class="player-name">${nome}</span><span class="player-score">${score}</span>`;
+            return li;
+        }
+
+        function mostraVuota(lista) {
+            const li = document.createElement('li');
+            li.className = 'classifica-vuota';
+            li.textContent = 'Nessun punteggio ancora';
+            lista.appendChild(li);
+        }
+
+        function aggiornaClassificaVisual() {
+            const lista = document.getElementById('lista-classifica');
+            lista.innerHTML = '';
+
+            if (window._giocoAttivo === '15') {
+                const dati = caricaClassifica();
+                const arr = Object.entries(dati)
+                    .map(([nome, stats]) => ({ nome, best: stats.best }))
+                    .sort((a, b) => a.best - b.best)
+                    .slice(0, 10);
+                if (arr.length === 0) return mostraVuota(lista);
+                arr.forEach((p, i) => lista.appendChild(creaRiga(i, p.nome, `${p.best} mosse`)));
+            } else {
+                const dati = caricaClassifica2048();
+                const arr = Object.entries(dati)
+                    .map(([nome, stats]) => ({ nome, best: stats.best }))
+                    .sort((a, b) => b.best - a.best)
+                    .slice(0, 10);
+                if (arr.length === 0) return mostraVuota(lista);
+                arr.forEach((p, i) => lista.appendChild(creaRiga(i, p.nome, `${p.best} pt`)));
+            }
+        }
+
+        // Submit: salva il punteggio del gioco attivo
+        const submitBtn = document.getElementById('submit-name');
+        submitBtn.addEventListener('click', () => {
+            const nome = document.getElementById('name-input').value.trim();
+            if (!nome) return;
+            if (window._giocoAttivo === '15') {
+                salvaPunteggio(nome);
+            } else {
+                salvaPunteggio2048(nome);
+            }
+            aggiornaClassificaVisual();
+            document.getElementById('victory-popup').classList.remove('show');
+            document.getElementById('name-input').value = '';
+        });
+
+        // Espone globalmente
+        window.aggiornaClassificaVisual = aggiornaClassificaVisual;
+
+        // Cambia gioco attivo e aggiorna classifica + titolo popup
+        window.setGiocoAttivo = (gioco) => {
+            window._giocoAttivo = gioco;
+            const titolo = document.getElementById('popup-title');
+            if (titolo) titolo.textContent = gioco === '2048' ? 'Partita terminata!' : 'Hai completato il gioco!';
+            aggiornaClassificaVisual();
+        };
+
+        // Avvio
+        aggiornaClassificaVisual();
+    </script>
 </body>
 </html>

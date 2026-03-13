@@ -29,8 +29,16 @@ function setupNav() {
     function setActive(activeEl) {
         [link15, link2048].forEach(el => el.classList.toggle('active', el === activeEl));
     }
-    link15.addEventListener('click', () => { setActive(link15); loadGame('15'); });
-    link2048.addEventListener('click', () => { setActive(link2048); loadGame('2048'); });
+    link15.addEventListener('click', () => {
+        setActive(link15);
+        if (window.setGiocoAttivo) window.setGiocoAttivo('15');
+        loadGame('15');
+    });
+    link2048.addEventListener('click', () => {
+        setActive(link2048);
+        if (window.setGiocoAttivo) window.setGiocoAttivo('2048');
+        loadGame('2048');
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

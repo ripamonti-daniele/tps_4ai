@@ -47,7 +47,7 @@ function renderTiles() {
     checkGameOver();
 }
 
-// Genera alcune tessere casuali all’inizio
+// Genera alcune tessere casuali all'inizio
 function spawnRandomTiles() {
     const count = Math.floor(Math.random() * 4) + 3;
     const indices = [];
@@ -221,17 +221,54 @@ function checkGameOver() {
     const full = cells.every(v => v > 0);
     if (!full) { btnReset.disabled = true; return; }
 
-    // controlla se esistono mosse possibili
     const canMove = ['left','right','up','down'].some(dir => {
         const clone = cells.slice();
         const ops = muovi(dir);
-        cells = clone; // ripristina
+        cells = clone;
         return ops && ops.length;
     });
 
     if (!canMove) {
         btnReset.disabled = false;
+        const score = cells.reduce((sum, val) => sum + val, 0);
+        const popup = document.getElementById('victory-popup');
+        const msg = document.getElementById('victory-message');
+        if (popup && msg) {
+            msg.textContent = `Hai totalizzato ${score} punti!`;
+            popup.classList.add('show');
+        }
     }
+}
+
+// --- Classifica (localStorage) ---
+
+export function caricaClassifica2048() {
+    try {
+        const raw = localStorage.getItem('gioco2048_classifica');
+        return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function salvaClassifica2048(dati) {
+    try {
+        localStorage.setItem('gioco2048_classifica', JSON.stringify(dati));
+    } catch (e) {}
+}
+
+export function salvaPunteggio2048(nome) {
+    if (!nome) return;
+    const score = cells.reduce((sum, val) => sum + val, 0);
+    const dati = caricaClassifica2048();
+    if (!dati[nome] || score > dati[nome].best) {
+        dati[nome] = { best: score };
+    }
+    salvaClassifica2048(dati);
+}
+
+function getCurrentScore() {
+    return cells.reduce((sum, val) => sum + val, 0);
 }
 
 // --- INIT ---
@@ -246,6 +283,7 @@ export function init() {
     spawnRandomTiles();
 
     const onReset = () => {
+        // Salva il punteggio corrente prima di resettare (se game over)
         buildGrid();
         spawnRandomTiles();
         updateScore();
@@ -255,11 +293,12 @@ export function init() {
 
     const onKey = async (e) => {
         const key = e.key.toLowerCase();
+        const inputFocused = document.activeElement && document.activeElement.id === 'name-input';
         let dir = null;
-        if (key === 'arrowup' || key === 'w') dir = 'up';
-        else if (key === 'arrowdown' || key === 's') dir = 'down';
-        else if (key === 'arrowleft' || key === 'a') dir = 'left';
-        else if (key === 'arrowright' || key === 'd') dir = 'right';
+        if (key === 'arrowup' || (!inputFocused && key === 'w')) dir = 'up';
+        else if (key === 'arrowdown' || (!inputFocused && key === 's')) dir = 'down';
+        else if (key === 'arrowleft' || (!inputFocused && key === 'a')) dir = 'left';
+        else if (key === 'arrowright' || (!inputFocused && key === 'd')) dir = 'right';
 
         if (dir) {
             e.preventDefault();
