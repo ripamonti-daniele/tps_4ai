@@ -1,251 +1,283 @@
-let _listeners = [];
-let btnReset = null;
-let displayPunteggio = null;
-let cells = [];
+// GIOCO 2048
 
-// Aggiorna il punteggio (somma di tutte le celle)
-function updateScore() {
+// Array piatto di 16 valori che rappresenta la griglia 4x4
+// L'indice i corrisponde a: riga = Math.floor(i/4), colonna = i%4
+let celle = [];
+
+// Riferimenti agli elementi HTML
+let pulsanteReset = null;
+let displayPunteggio = null;
+
+// Lista dei listener aggiunti (serve per rimuoverli quando si cambia gioco)
+let _listeners = [];
+
+// ---- PUNTEGGIO ----
+
+function aggiornaPunteggio() {
     if (!displayPunteggio) return;
-    const score = cells.reduce((sum, val) => sum + val, 0);
-    displayPunteggio.textContent = 'Punteggio: ' + score;
+    const punteggio = celle.reduce((somma, val) => somma + val, 0);
+    displayPunteggio.textContent = 'Punteggio: ' + punteggio;
 }
 
-// Costruisce la griglia 4x4
-function buildGrid() {
+// ---- COSTRUZIONE DELLA GRIGLIA ----
+
+function costruisciGriglia() {
     const griglia = document.getElementById('game-board');
     if (!griglia) return;
     griglia.innerHTML = '';
-    cells = new Array(16).fill(0);
+    celle = new Array(16).fill(0);
+
     for (let i = 0; i < 16; i++) {
-        const bg = document.createElement('div');
-        bg.className = 'bg-cell';
-        bg.dataset.index = i;
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        bg.appendChild(tile);
-        griglia.appendChild(bg);
+        // Ogni cella ha uno sfondo fisso e una tessera sopra
+        const sfondo = document.createElement('div');
+        sfondo.className = 'bg-cell';
+        sfondo.dataset.index = i;
+
+        const tessera = document.createElement('div');
+        tessera.className = 'tile';
+        sfondo.appendChild(tessera);
+        griglia.appendChild(sfondo);
     }
 }
 
-// Mostra le tessere sulla griglia
-function renderTiles() {
+// Disegna le tessere sulla griglia in base all'array `celle`
+function disegnaGriglia() {
     for (let i = 0; i < 16; i++) {
-        const bg = document.querySelector(`#game-board .bg-cell[data-index='${i}']`);
-        if (!bg) continue;
-        const tile = bg.querySelector('.tile');
-        const val = cells[i] || 0;
-        tile.className = 'tile';
-        tile.style.opacity = '1';
-        if (val > 0) {
-            tile.textContent = String(val);
-            tile.classList.add('tile-' + val);
+        const sfondo = document.querySelector(`#game-board .bg-cell[data-index='${i}']`);
+        if (!sfondo) continue;
+        const tessera = sfondo.querySelector('.tile');
+        const valore = celle[i] || 0;
+
+        tessera.className = 'tile';
+        tessera.style.opacity = '1';
+
+        if (valore > 0) {
+            tessera.textContent = String(valore);
+            tessera.classList.add('tile-' + valore); // aggiunge il colore giusto (es. tile-2, tile-4...)
         } else {
-            tile.textContent = '';
+            tessera.textContent = '';
         }
     }
-    updateScore();
-    checkGameOver();
+    aggiornaPunteggio();
+    controllaFinePartita();
 }
 
-// Genera alcune tessere casuali all'inizio
-function spawnRandomTiles() {
-    const count = Math.floor(Math.random() * 4) + 3;
-    const indices = [];
-    while (indices.length < count) {
+// ---- GENERAZIONE TESSERE ----
+
+// Genera alcune tessere casuali all'inizio della partita
+function generaTessereCasuali() {
+    const tessereIniziali = Math.floor(Math.random() * 4) + 3; // da 3 a 6 tessere iniziali
+    const indiciScelti = [];
+    while (indiciScelti.length < tessereIniziali) {
         const idx = Math.floor(Math.random() * 16);
-        if (!indices.includes(idx)) indices.push(idx);
+        if (!indiciScelti.includes(idx)) indiciScelti.push(idx);
     }
-    indices.forEach(i => {
-        cells[i] = Math.random() < 0.5 ? 2 : 4;
+    indiciScelti.forEach(i => {
+        celle[i] = Math.random() < 0.5 ? 2 : 4;
     });
-    renderTiles();
+    disegnaGriglia();
 }
 
-// Genera una tessera casuale dopo ogni mossa
-function spawnOneTile() {
-    const empty = [];
-    for (let i = 0; i < 16; i++) if (!cells[i] || cells[i] === 0) empty.push(i);
-    if (empty.length === 0) return false;
-    const idx = empty[Math.floor(Math.random() * empty.length)];
-    cells[idx] = Math.random() < 0.9 ? 2 : 4;
+// Genera una sola tessera casuale dopo ogni mossa
+function generaUnaTessera() {
+    const celleVuote = [];
+    for (let i = 0; i < 16; i++) {
+        if (!celle[i] || celle[i] === 0) celleVuote.push(i);
+    }
+    if (celleVuote.length === 0) return false;
+    const idx = celleVuote[Math.floor(Math.random() * celleVuote.length)];
+    celle[idx] = Math.random() < 0.9 ? 2 : 4; // 90% di probabilità che sia 2, 10% che sia 4
     return true;
 }
 
-// Controlla se due array sono uguali
-function arraysEqual(a, b) {
+// ---- LOGICA DEL MOVIMENTO ----
+
+// Controlla se due array hanno gli stessi valori
+function arrayUguali(a, b) {
     if (a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
     return true;
 }
 
-// Crea un clone per animazioni
-function createClone(value) {
-    const clone = document.createElement('div');
-    clone.className = 'tile tile-clone';
-    if (value) clone.classList.add('tile-' + value);
-    clone.textContent = value ? String(value) : '';
-    return clone;
+// Elabora una riga: compatta i valori verso sinistra e unisce le coppie uguali
+// Riceve un array di oggetti { val, pos } e restituisce i nuovi valori e da dove venivano
+function elaboraRiga(riga) {
+    // Rimuovi gli zeri
+    const compact = riga.filter(x => x.val && x.val !== 0);
+
+    const risultato = [];   // nuovi valori della riga
+    const origini = [];     // da quali posizioni originali vengono i valori
+
+    let i = 0;
+    while (i < compact.length) {
+        // Se i due valori adiacenti sono uguali (e non sono 2048), uniscili
+        if (i + 1 < compact.length && compact[i].val === compact[i + 1].val && compact[i].val !== 2048) {
+            risultato.push(compact[i].val * 2);
+            origini.push([compact[i].pos, compact[i + 1].pos]);
+            i += 2;
+        } else {
+            risultato.push(compact[i].val);
+            origini.push([compact[i].pos]);
+            i += 1;
+        }
+    }
+
+    // Riempi con zeri fino a 4 elementi
+    while (risultato.length < 4) {
+        risultato.push(0);
+        origini.push([]);
+    }
+
+    return { risultato, origini };
 }
 
-// Animazione dei movimenti
-function animateOps(ops) {
-    return new Promise(resolve => {
-        const board = document.getElementById('game-board');
-        if (!board || !ops || !ops.length) return resolve();
+// Esegue il movimento in una direzione e restituisce le operazioni animate (o null se niente è cambiato)
+function muovi(direzione) {
+    const prima = celle.slice(); // salva lo stato prima della mossa
+    const operazioni = [];       // lista dei movimenti da animare
 
-        const clones = [];
-        const originalTiles = [];
+    if (direzione === 'sinistra') {
+        for (let r = 0; r < 4; r++) {
+            const base = r * 4;
+            const riga = [0, 1, 2, 3].map(k => ({ val: celle[base + k], pos: base + k })); //somma a ogni elemento la base per ottenere l'indice corretto in celle
+            const { risultato, origini } = elaboraRiga(riga);
+            risultato.forEach((v, k) => celle[base + k] = v);
+            origini.forEach((lista, idx) => {
+                const destinazione = base + idx;
+                lista.forEach(origine => operazioni.push({ da: origine, a: destinazione, valPrima: prima[origine] }));
+            });
+        }
+    } else if (direzione === 'destra') {
+        for (let r = 0; r < 4; r++) {
+            const base = r * 4;
+            const riga = [3, 2, 1, 0].map(k => ({ val: celle[base + k], pos: base + k }));
+            const { risultato, origini } = elaboraRiga(riga);
+            risultato.forEach((v, k) => celle[base + (3 - k)] = v);
+            origini.forEach((lista, idx) => {
+                const destinazione = base + (3 - idx);
+                lista.forEach(origine => operazioni.push({ da: origine, a: destinazione, valPrima: prima[origine] }));
+            });
+        }
+    } else if (direzione === 'su') {
+        for (let c = 0; c < 4; c++) {
+            const riga = [0, 1, 2, 3].map(k => ({ val: celle[c + 4 * k], pos: c + 4 * k }));
+            const { risultato, origini } = elaboraRiga(riga);
+            risultato.forEach((v, k) => celle[c + 4 * k] = v);
+            origini.forEach((lista, idx) => {
+                const destinazione = c + 4 * idx;
+                lista.forEach(origine => operazioni.push({ da: origine, a: destinazione, valPrima: prima[origine] }));
+            });
+        }
+    } else if (direzione === 'giu') {
+        for (let c = 0; c < 4; c++) {
+            const riga = [3, 2, 1, 0].map(k => ({ val: celle[c + 4 * k], pos: c + 4 * k }));
+            const { risultato, origini } = elaboraRiga(riga);
+            risultato.forEach((v, k) => celle[c + 4 * (3 - k)] = v);
+            origini.forEach((lista, idx) => {
+                const destinazione = c + 4 * (3 - idx);
+                lista.forEach(origine => operazioni.push({ da: origine, a: destinazione, valPrima: prima[origine] }));
+            });
+        }
+    }
 
-        ops.forEach(op => {
-            const fromCell = board.querySelector(`.bg-cell[data-index='${op.from}']`);
-            const toCell   = board.querySelector(`.bg-cell[data-index='${op.to}']`);
-            if (!fromCell || !toCell) return;
+    // Tieni solo le operazioni dove la tessera si è davvero spostata
+    const opSignificative = operazioni.filter(o => o.valPrima && o.da !== o.a);
+    if (arrayUguali(prima, celle) || opSignificative.length === 0) return null;
+    return opSignificative;
+}
 
-            const tileOrig = fromCell.querySelector('.tile');
-            originalTiles.push(tileOrig);
-            tileOrig.style.opacity = '0';
+// ---- ANIMAZIONI ----
 
-            const clone = createClone(op.valueBefore);
-            const fromLeft = fromCell.offsetLeft;
-            const fromTop  = fromCell.offsetTop;
-            const toLeft   = toCell.offsetLeft;
-            const toTop    = toCell.offsetTop;
+// Anima le tessere che si spostano
+function animaMovimento(operazioni) {
+    return new Promise(risolvi => {
+        const griglia = document.getElementById('game-board');
+        if (!griglia || !operazioni || !operazioni.length) return risolvi();
 
-            clone.style.position = 'absolute';
-            clone.style.left = fromLeft + 'px';
-            clone.style.top  = fromTop + 'px';
-            clone.style.width  = fromCell.offsetWidth + 'px';
-            clone.style.height = fromCell.offsetHeight + 'px';
-            clone.style.transition = 'transform 180ms ease, opacity 160ms ease';
-            clone.style.zIndex = '1000';
-            clone.style.willChange = 'transform';
+        const cloni = [];
+        const tessereOriginali = [];
 
-            board.appendChild(clone);
-            clones.push({ el: clone, dx: toLeft - fromLeft, dy: toTop - fromTop });
+        operazioni.forEach(op => {
+            const cellaPartenza = griglia.querySelector(`.bg-cell[data-index='${op.da}']`);
+            const cellaArrivo   = griglia.querySelector(`.bg-cell[data-index='${op.a}']`);
+            if (!cellaPartenza || !cellaArrivo) return;
+
+            // Nascondi la tessera originale durante l'animazione
+            const tessera = cellaPartenza.querySelector('.tile');
+            tessereOriginali.push(tessera);
+            tessera.style.opacity = '0';
+
+            // Crea un clone che si sposterà visivamente
+            const cloneEl = document.createElement('div');
+            cloneEl.className = 'tile tile-clone';
+            if (op.valPrima) cloneEl.classList.add('tile-' + op.valPrima);
+            cloneEl.textContent = op.valPrima ? String(op.valPrima) : '';
+
+            // Posiziona il clone sopra la cella di partenza
+            cloneEl.style.position = 'absolute';
+            cloneEl.style.left = cellaPartenza.offsetLeft + 'px';
+            cloneEl.style.top  = cellaPartenza.offsetTop + 'px';
+            cloneEl.style.width  = cellaPartenza.offsetWidth + 'px';
+            cloneEl.style.height = cellaPartenza.offsetHeight + 'px';
+            cloneEl.style.transition = 'transform 180ms ease, opacity 160ms ease';
+            cloneEl.style.zIndex = '1000';
+
+            griglia.appendChild(cloneEl);
+
+            // Calcola di quanto deve spostarsi
+            const dx = cellaArrivo.offsetLeft - cellaPartenza.offsetLeft;
+            const dy = cellaArrivo.offsetTop  - cellaPartenza.offsetTop;
+            cloni.push({ el: cloneEl, dx, dy });
         });
 
-        void board.offsetWidth;
+        void griglia.offsetWidth; // forza il browser a "vedere" la posizione iniziale prima di animare
 
-        clones.forEach(c => {
+        // Avvia l'animazione
+        cloni.forEach(c => {
             c.el.style.transform = `translate(${c.dx}px, ${c.dy}px)`;
         });
 
+        // Dopo l'animazione: rimuovi i cloni e mostra le tessere vere
         setTimeout(() => {
-            clones.forEach(c => c.el.remove());
-            originalTiles.forEach(t => t.style.opacity = '1');
-            resolve();
+            cloni.forEach(c => c.el.remove());
+            tessereOriginali.forEach(t => t.style.opacity = '1');
+            risolvi();
         }, 180);
     });
 }
 
-// Merge line, blocca merge 2048 + 2048
-function processLine(line) {
-    const packed = line.filter(x => x.val && x.val !== 0);
-    const out = [];
-    const fromLists = [];
-    let i = 0;
-    while (i < packed.length) {
-        if (i + 1 < packed.length && packed[i].val === packed[i + 1].val && packed[i].val !== 2048) {
-            out.push(packed[i].val * 2);
-            fromLists.push([packed[i].pos, packed[i + 1].pos]);
-            i += 2;
-        } else {
-            out.push(packed[i].val);
-            fromLists.push([packed[i].pos]);
-            i += 1;
-        }
-    }
-    while (out.length < 4) {
-        out.push(0);
-        fromLists.push([]);
-    }
-    return { out, fromLists };
-}
+// ---- FINE PARTITA ----
 
-// Esegue il movimento
-function muovi(direzione) {
-    const before = cells.slice();
-    const ops = [];
+function controllaFinePartita() {
+    const grigliaPiena = celle.every(v => v > 0);
+    if (!grigliaPiena) { pulsanteReset.disabled = true; return; }
 
-    if (direzione === 'left') {
-        for (let r = 0; r < 4; r++) {
-            const base = r * 4;
-            const line = [0,1,2,3].map(k => ({ val: cells[base+k], pos: base+k }));
-            const result = processLine(line);
-            result.out.forEach((v,k)=>cells[base+k]=v);
-            result.fromLists.forEach((fromList, idx)=>{
-                const toIndex = base + idx;
-                fromList.forEach(fromPos => ops.push({ from: fromPos, to: toIndex, valueBefore: before[fromPos], valueAfter: cells[toIndex] }));
-            });
-        }
-    } else if (direzione === 'right') {
-        for (let r = 0; r < 4; r++) {
-            const base = r * 4;
-            const line = [3,2,1,0].map(k => ({ val: cells[base+k], pos: base+k }));
-            const result = processLine(line);
-            result.out.forEach((v,k)=>cells[base+(3-k)]=v);
-            result.fromLists.forEach((fromList, idx)=>{
-                const toIndex = base + (3 - idx);
-                fromList.forEach(fromPos => ops.push({ from: fromPos, to: toIndex, valueBefore: before[fromPos], valueAfter: cells[toIndex] }));
-            });
-        }
-    } else if (direzione === 'up') {
-        for (let c = 0; c < 4; c++) {
-            const line = [0,1,2,3].map(k=>({ val: cells[c + 4*k], pos: c + 4*k }));
-            const result = processLine(line);
-            result.out.forEach((v,k)=>cells[c+4*k]=v);
-            result.fromLists.forEach((fromList, idx)=>{
-                const toIndex = c + 4*idx;
-                fromList.forEach(fromPos => ops.push({ from: fromPos, to: toIndex, valueBefore: before[fromPos], valueAfter: cells[toIndex] }));
-            });
-        }
-    } else if (direzione === 'down') {
-        for (let c = 0; c < 4; c++) {
-            const line = [3,2,1,0].map(k=>({ val: cells[c+4*k], pos: c+4*k }));
-            const result = processLine(line);
-            result.out.forEach((v,k)=>cells[c+4*(3-k)]=v);
-            result.fromLists.forEach((fromList, idx)=>{
-                const toIndex = c + 4*(3-idx);
-                fromList.forEach(fromPos => ops.push({ from: fromPos, to: toIndex, valueBefore: before[fromPos], valueAfter: cells[toIndex] }));
-            });
-        }
-    }
-
-    const meaningful = ops.filter(o => o.valueBefore && o.from !== o.to);
-    if (arraysEqual(before, cells) || meaningful.length === 0) return null;
-    return meaningful;
-}
-
-// Controlla se non ci sono più mosse possibili
-function checkGameOver() {
-    const full = cells.every(v => v > 0);
-    if (!full) { btnReset.disabled = true; return; }
-
-    const canMove = ['left','right','up','down'].some(dir => {
-        const clone = cells.slice();
+    // Prova tutte le direzioni: se almeno una mossa è possibile, la partita continua
+    const puoAncoraGiocare = ['sinistra', 'destra', 'su', 'giu'].some(dir => {
+        const backup = celle.slice();
         const ops = muovi(dir);
-        cells = clone;
+        celle = backup; // ripristina (muovi() modifica celle direttamente)
         return ops && ops.length;
     });
 
-    if (!canMove) {
-        btnReset.disabled = false;
-        const score = cells.reduce((sum, val) => sum + val, 0);
+    if (!puoAncoraGiocare) {
+        pulsanteReset.disabled = false;
+        const punteggio = celle.reduce((somma, val) => somma + val, 0);
         const popup = document.getElementById('victory-popup');
-        const msg = document.getElementById('victory-message');
-        if (popup && msg) {
-            msg.textContent = `Hai totalizzato ${score} punti!`;
+        const messaggio = document.getElementById('victory-message');
+        if (popup && messaggio) {
+            messaggio.textContent = `Hai totalizzato ${punteggio} punti!`;
             popup.classList.add('show');
         }
     }
 }
 
-// --- Classifica (localStorage) ---
+// ---- CLASSIFICA (salvata nel browser) ----
 
 export function caricaClassifica2048() {
     try {
-        const raw = localStorage.getItem('gioco2048_classifica');
-        return raw ? JSON.parse(raw) : {};
+        const datiGrezzi = localStorage.getItem('gioco2048_classifica');
+        return datiGrezzi ? JSON.parse(datiGrezzi) : {};
     } catch (e) {
         return {};
     }
@@ -259,66 +291,66 @@ function salvaClassifica2048(dati) {
 
 export function salvaPunteggio2048(nome) {
     if (!nome) return;
-    const score = cells.reduce((sum, val) => sum + val, 0);
+    const punteggio = celle.reduce((somma, val) => somma + val, 0);
     const dati = caricaClassifica2048();
-    if (!dati[nome] || score > dati[nome].best) {
-        dati[nome] = { best: score };
+    // Salva solo se è il miglior punteggio (più punti = meglio)
+    if (!dati[nome] || punteggio > dati[nome].best) {
+        dati[nome] = { best: punteggio };
     }
     salvaClassifica2048(dati);
 }
 
-function getCurrentScore() {
-    return cells.reduce((sum, val) => sum + val, 0);
-}
+// ---- INIT E DESTROY (usati da main.js per cambiare gioco) ----
 
-// --- INIT ---
 export function init() {
     const griglia = document.getElementById('game-board');
     if (!griglia) return;
 
-    btnReset = document.getElementById('reset-btn');
+    pulsanteReset = document.getElementById('reset-btn');
     displayPunteggio = document.getElementById('moves');
 
-    buildGrid();
-    spawnRandomTiles();
+    costruisciGriglia();
+    generaTessereCasuali();
 
-    const onReset = () => {
-        // Salva il punteggio corrente prima di resettare (se game over)
-        buildGrid();
-        spawnRandomTiles();
-        updateScore();
-        btnReset.disabled = true;
+    // Pulsante "Gioca ancora"
+    const alReset = () => {
+        costruisciGriglia();
+        generaTessereCasuali();
+        aggiornaPunteggio();
+        pulsanteReset.disabled = true;
     };
-    if (btnReset) { btnReset.addEventListener('click', onReset); _listeners.push({ el: btnReset, type: 'click', fn: onReset }); }
+    pulsanteReset.addEventListener('click', alReset);
+    _listeners.push({ elemento: pulsanteReset, tipo: 'click', funzione: alReset });
 
-    const onKey = async (e) => {
-        const key = e.key.toLowerCase();
-        const inputFocused = document.activeElement && document.activeElement.id === 'name-input';
-        let dir = null;
-        if (key === 'arrowup' || (!inputFocused && key === 'w')) dir = 'up';
-        else if (key === 'arrowdown' || (!inputFocused && key === 's')) dir = 'down';
-        else if (key === 'arrowleft' || (!inputFocused && key === 'a')) dir = 'left';
-        else if (key === 'arrowright' || (!inputFocused && key === 'd')) dir = 'right';
+    // Controlli da tastiera
+    const alTasto = async (e) => {
+        const tasto = e.key.toLowerCase();
+        const inputAttivo = document.activeElement && document.activeElement.id === 'name-input';
+        let direzione = null;
 
-        if (dir) {
+        if (tasto === 'arrowup' || (!inputAttivo && tasto === 'w')) direzione = 'su';
+        else if (tasto === 'arrowdown' || (!inputAttivo && tasto === 's')) direzione = 'giu';
+        else if (tasto === 'arrowleft' || (!inputAttivo && tasto === 'a')) direzione = 'sinistra';
+        else if (tasto === 'arrowright' || (!inputAttivo && tasto === 'd')) direzione = 'destra';
+
+        if (direzione) {
             e.preventDefault();
-            const ops = muovi(dir);
+            const ops = muovi(direzione);
             if (ops && ops.length) {
-                await animateOps(ops);
-                spawnOneTile();
-                renderTiles();
+                await animaMovimento(ops);
+                generaUnaTessera();
+                disegnaGriglia();
             }
         }
     };
-    document.addEventListener('keydown', onKey);
-    _listeners.push({ el: document, type: 'keydown', fn: onKey });
+    document.addEventListener('keydown', alTasto);
+    _listeners.push({ elemento: document, tipo: 'keydown', funzione: alTasto });
 }
 
-// --- DESTROY ---
 export function destroy() {
-    _listeners.forEach(l => l.el.removeEventListener(l.type, l.fn));
+    _listeners.forEach(l => l.elemento.removeEventListener(l.tipo, l.funzione));
     _listeners = [];
     const griglia = document.getElementById('game-board');
     if (griglia) griglia.innerHTML = '';
-    cells = [];
+    celle = [];
 }

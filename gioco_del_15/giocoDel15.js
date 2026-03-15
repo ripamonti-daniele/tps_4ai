@@ -1,3 +1,23 @@
+// GIOCO DEL 15
+
+// Lista dei numeri da 1 a 15
+let numeri = [];
+for (let i = 1; i <= 15; i++) numeri.push(i);
+
+// Variabili di stato
+let contatoreMosse = 0;
+let partitaFinita = false;
+let animazioneInCorso = false;
+
+// Riferimenti agli elementi HTML
+let griglia, pulsanteReset, displayMosse;
+
+// Lista dei listener aggiunti (serve per rimuoverli quando si cambia gioco)
+let _listeners = [];
+
+// ---- FUNZIONI PRINCIPALI ----
+
+// Mescola un array in modo casuale (algoritmo Fisher-Yates)
 function mescola(array) {
     for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
@@ -5,24 +25,23 @@ function mescola(array) {
     }
 }
 
-function inizializzaGriglia() {
+// Costruisce la griglia di gioco nell'HTML
+function creaGriglia() {
     griglia.innerHTML = "";
-    btnReset.disabled = true;
-
+    pulsanteReset.disabled = true;
     if (displayMosse) displayMosse.textContent = "Mosse: 0";
 
     for (let i = 0; i < 16; i++) {
-
         const cella = document.createElement("div");
-
         cella.classList.add("cella");
         cella.id = "cella-" + i;
-
         cella.addEventListener("click", () => sposta(i));
 
         if (i < 15) {
+            // Celle numerate
             cella.textContent = numeri[i];
         } else {
+            // L'ultima cella è il buco (vuoto)
             cella.textContent = "";
             cella.classList.add("empty");
         }
@@ -31,101 +50,83 @@ function inizializzaGriglia() {
     }
 }
 
+// Gestisce il click su una cella: la sposta se è adiacente al buco
 function sposta(indice) {
+    // Ignora il click se la partita è finita, l'indice non è valido,
+    // la cella è il buco, oppure c'è un'animazione in corso
+    if (partitaFinita || indice < 0 || indice > 15 || griglia.children[indice].classList.contains("empty") || animazioneInCorso) return;
 
-    if (
-        finePartita ||
-        indice < 0 ||
-        indice > 15 ||
-        griglia.children[indice].classList.contains("empty") ||
-        animazione
-    ) return;
-
+    // Controlla le 4 direzioni possibili (su, giù, sinistra, destra)
     if (indice - 4 >= 0 && griglia.children[indice - 4].classList.contains("empty"))
         scambia(indice, indice - 4);
-
     else if (indice + 4 <= 15 && griglia.children[indice + 4].classList.contains("empty"))
         scambia(indice, indice + 4);
-
     else if (indice % 4 !== 0 && griglia.children[indice - 1].classList.contains("empty"))
         scambia(indice, indice - 1);
-
     else if (indice % 4 !== 3 && griglia.children[indice + 1].classList.contains("empty"))
         scambia(indice, indice + 1);
 }
 
+// Anima e poi esegue lo scambio tra la cella cliccata e il buco
 function scambia(i, j) {
-
-    animazione = true;
+    animazioneInCorso = true;
 
     const cella = griglia.children[i];
 
-    const rigaI = Math.floor(i / 4);
-    const colonnaI = i % 4;
-
-    const rigaJ = Math.floor(j / 4);
-    const colonnaJ = j % 4;
-
-    const dx = (colonnaJ - colonnaI) * 100;
-    const dy = (rigaJ - rigaI) * 100;
-
+    // Calcola di quanti "blocchi" si deve spostare (in % rispetto alla cella)
+    const dx = (j % 4 - i % 4) * 100;
+    const dy = (Math.floor(j / 4) - Math.floor(i / 4)) * 100;
     cella.style.transform = `translate(${dx}%, ${dy}%)`;
 
     setTimeout(() => {
-
+        // Scambia i contenuti delle due celle
         const temp = griglia.children[i].textContent;
-
         griglia.children[i].textContent = griglia.children[j].textContent;
         griglia.children[j].textContent = temp;
 
+        // Scambia la classe "empty" tra le due celle
         griglia.children[i].classList.toggle("empty");
         griglia.children[j].classList.toggle("empty");
 
         cella.style.transform = "";
 
-        mosse++;
-
-        if (displayMosse)
-            displayMosse.textContent = "Mosse: " + mosse;
+        contatoreMosse++;
+        if (displayMosse) displayMosse.textContent = "Mosse: " + contatoreMosse;
 
         controllaVittoria();
-
-        animazione = false;
-
+        animazioneInCorso = false;
     }, 150);
 }
 
+// Controlla se le tessere sono nell'ordine corretto (1, 2, 3, ..., 15, buco)
 function controllaVittoria() {
-
     for (let i = 1; i < 16; i++) {
-        if (parseInt(griglia.children[i - 1].textContent) !== i)
-            return false;
+        if (parseInt(griglia.children[i - 1].textContent) !== i) return false;
     }
 
-    btnReset.disabled = false;
-    finePartita = true;
-
+    // Vittoria
+    pulsanteReset.disabled = false;
+    partitaFinita = true;
     document.getElementById("victory-message").textContent =
-        "Hai completato il gioco in " + mosse + " mosse!";
-
+        "Hai completato il gioco in " + contatoreMosse + " mosse!";
     document.getElementById("victory-popup").classList.add("show");
-
     return true;
 }
 
+// Resetta il gioco
 function reset() {
-    mosse = 0;
-    finePartita = false;
+    contatoreMosse = 0;
+    partitaFinita = false;
     mescola(numeri);
-    inizializzaGriglia();
+    creaGriglia();
 }
 
-// --- Classifica (localStorage) ---
+// CLASSIFICA (salvata nel browser)
 
 export function caricaClassifica() {
     try {
-        const raw = localStorage.getItem('gioco15_classifica');
-        return raw ? JSON.parse(raw) : {};
+        const datiGrezzi = localStorage.getItem('gioco15_classifica');
+        return datiGrezzi ? JSON.parse(datiGrezzi) : {};
     } catch (e) {
         return {};
     }
@@ -140,60 +141,34 @@ function salvaClassifica(dati) {
 export function salvaPunteggio(nome) {
     if (!nome) return;
     const dati = caricaClassifica();
-    if (!dati[nome] || mosse < dati[nome].best) {
-        dati[nome] = { best: mosse };
+    // Salva solo se è il miglior punteggio (meno mosse = meglio)
+    if (!dati[nome] || contatoreMosse < dati[nome].best) {
+        dati[nome] = { best: contatoreMosse };
     }
     salvaClassifica(dati);
 }
 
-let _listeners = [];
+// ---- INIT E DESTROY (usati da main.js per cambiare gioco) ----
 
 export function init() {
-
     griglia = document.getElementById("game-board");
-    btnReset = document.getElementById("reset-btn");
+    pulsanteReset = document.getElementById("reset-btn");
     displayMosse = document.getElementById("moves");
 
-    mosse = 0;
-    finePartita = false;
-    animazione = false;
+    contatoreMosse = 0;
+    partitaFinita = false;
+    animazioneInCorso = false;
 
-    const onReset = reset;
-
-    btnReset.addEventListener("click", onReset);
-
-    _listeners.push({ el: btnReset, type: "click", fn: onReset });
+    pulsanteReset.addEventListener("click", reset);
+    _listeners.push({ elemento: pulsanteReset, tipo: "click", funzione: reset });
 
     mescola(numeri);
-    inizializzaGriglia();
+    creaGriglia();
 }
 
 export function destroy() {
-
-    _listeners.forEach(l =>
-        l.el.removeEventListener(l.type, l.fn)
-    );
-
+    _listeners.forEach(l => l.elemento.removeEventListener(l.tipo, l.funzione));
     _listeners = [];
-
     const board = document.getElementById("game-board");
-
-    if (board)
-        board.innerHTML = "";
-
+    if (board) board.innerHTML = "";
 }
-
-let griglia = document.getElementById("game-board");
-let btnReset = document.getElementById("reset-btn");
-let displayMosse = document.getElementById("moves");
-
-let finePartita = false;
-
-let numeri = [];
-
-for (let i = 1; i <= 15; i++)
-    numeri.push(i);
-
-let mosse = 0;
-
-let animazione = false;

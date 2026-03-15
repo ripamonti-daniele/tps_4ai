@@ -1,47 +1,55 @@
-let currentModule = null;
+// MAIN.JS — gestisce il passaggio tra i due giochi
 
-async function loadGame(name) {
-    if (currentModule && currentModule.destroy) {
-        try { currentModule.destroy(); } catch (e) { console.error(e); }
-        currentModule = null;
+// Tiene in memoria il modulo del gioco attualmente caricato
+let moduloCorrente = null;
+
+// Carica e avvia un gioco (nome = '15' oppure '2048')
+async function caricaGioco(nome) {
+    // Prima di caricare il nuovo gioco, distruggi quello vecchio
+    if (moduloCorrente && moduloCorrente.destroy) {
+        try { moduloCorrente.destroy(); } catch (e) { console.error(e); }
+        moduloCorrente = null;
     }
 
-    const title = document.getElementById('page-title');
-    const board = document.getElementById('game-board');
-    if (name === '15') {
-        const mod = await import('./giocoDel15.js');
-        currentModule = mod;
-        if (title) title.textContent = 'Gioco del 15';
-        if (board) board.classList.remove('mode-2048');
-        if (currentModule.init) currentModule.init();
-    } else if (name === '2048') {
-        const mod = await import('./2048.js');
-        currentModule = mod;
-        if (title) title.textContent = '2048';
-        if (board) board.classList.add('mode-2048');
-        if (currentModule.init) currentModule.init();
+    const griglia = document.getElementById('game-board');
+
+    if (nome === '15') {
+        const modulo = await import('./giocoDel15.js');
+        moduloCorrente = modulo;
+        if (griglia) griglia.classList.remove('mode-2048');
+        modulo.init();
+    } else if (nome === '2048') {
+        const modulo = await import('./2048.js');
+        moduloCorrente = modulo;
+        if (griglia) griglia.classList.add('mode-2048');
+        modulo.init();
     }
 }
 
-function setupNav() {
+// Imposta i link di navigazione in alto (Gioco del 15 | 2048)
+function impostaNavigazione() {
     const link15 = document.getElementById('link-15');
     const link2048 = document.getElementById('link-2048');
-    function setActive(activeEl) {
-        [link15, link2048].forEach(el => el.classList.toggle('active', el === activeEl));
+
+    function impostaAttivo(linkAttivo) {
+        [link15, link2048].forEach(el => el.classList.toggle('active', el === linkAttivo));
     }
+
     link15.addEventListener('click', () => {
-        setActive(link15);
+        impostaAttivo(link15);
         if (window.setGiocoAttivo) window.setGiocoAttivo('15');
-        loadGame('15');
+        caricaGioco('15');
     });
+
     link2048.addEventListener('click', () => {
-        setActive(link2048);
+        impostaAttivo(link2048);
         if (window.setGiocoAttivo) window.setGiocoAttivo('2048');
-        loadGame('2048');
+        caricaGioco('2048');
     });
 }
 
+// Quando la pagina è pronta, imposta la navigazione e avvia il Gioco del 15
 document.addEventListener('DOMContentLoaded', () => {
-    setupNav();
-    loadGame('15');
+    impostaNavigazione();
+    caricaGioco('15');
 });
